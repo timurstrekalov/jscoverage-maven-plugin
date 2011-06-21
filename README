@@ -24,6 +24,7 @@ Example config:
         <excludes>
             <exclude>not-really-javascript.js</exclude>
             <exclude>some-other-crap.js</exclude>
+            <exclude>**/*someAntPattern*</exclude>
         </excludes>
         <tests>
             <test>target/TestAll.html</test>
