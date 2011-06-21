@@ -66,8 +66,6 @@ class InstrumentClassesMojo extends GroovyMojo {
 
         def scanner = ant.fileScanner {
             fileset(dir: srcDir, defaultexcludes: false) {
-                include name: "**/.svn"
-                include name: "**/.svn/**"
                 excludes.each {
                     include name: it
                 }
