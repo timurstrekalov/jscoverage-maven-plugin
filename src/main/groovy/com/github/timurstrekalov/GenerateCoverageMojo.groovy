@@ -47,6 +47,13 @@ class GenerateCoverageMojo extends GroovyMojo {
      */
     List<String> formats
 
+    /**
+     * Directory where the coverage files will be written
+     *
+     * @parameter default-value="${project.build.directory}${file.separator}coverage"
+     */
+    String coverageOutputDir
+
     public void execute() {
         def webClient = new WebClient(BrowserVersion.FIREFOX_3_6)
 
@@ -79,7 +86,10 @@ class GenerateCoverageMojo extends GroovyMojo {
     }
 
     private void generateReports(coverage) {
-        new File("coverage").mkdir()
+        def out = new File(coverageOutputDir)
+        if (!out.exists()) {
+            out.mkdirs()
+        }
 
         if ('csv' in formats) {
             generateCsvReport(coverage)
@@ -96,12 +106,12 @@ class GenerateCoverageMojo extends GroovyMojo {
 
     private void generateCsvReport(Coverage coverage) {
         log.info "Generating CSV report"
-        new CsvReporter("coverage/coverage.csv", coverage).generate()
+        new CsvReporter("${coverageOutputDir}/coverage.csv", coverage).generate()
     }
 
     private void generateXmlReport(coverage) {
         log.info "Generating XML report"
-        new XmlReporter("coverage/coverage.xml", coverage).generate()
+        new XmlReporter("${coverageOutputDir}/coverage.xml", coverage).generate()
     }
 
     private void generateConsoleReport(Coverage coverage) {
