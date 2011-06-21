@@ -30,3 +30,8 @@ Example config:
         </tests>
     </configuration>
 </plugin>
+
+Instrumentation:
+    mvn jscoverage:instrument
+Coverage report;
+    mvn jscoverage:coverage
