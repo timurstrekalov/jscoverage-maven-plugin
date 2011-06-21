@@ -1,0 +1,5 @@
+Generates coverage information about JavaScript files using JSCoverage.
+
+As of this moment, you have to provide the path to jscoverage.
+
+Supported formats are: csv, xml and simple console output.
