@@ -1,7 +1,5 @@
 package com.github.timurstrekalov
 
-import groovy.xml.MarkupBuilder
-
 import java.io.File
 import java.util.List
 
@@ -14,6 +12,10 @@ import com.gargoylesoftware.htmlunit.ScriptPreProcessor
 import com.gargoylesoftware.htmlunit.WebClient
 import com.gargoylesoftware.htmlunit.html.HtmlElement
 import com.gargoylesoftware.htmlunit.html.HtmlPage
+import com.github.timurstrekalov.coverage.Coverage
+import com.github.timurstrekalov.reporter.ConsoleReporter
+import com.github.timurstrekalov.reporter.CsvReporter
+import com.github.timurstrekalov.reporter.XmlReporter
 
 /**
 * Generates coverage and outputs it to the log.
@@ -69,11 +71,11 @@ class GenerateCoverageMojo extends GroovyMojo {
                 returnJsCoverageVarScript).javaScriptResult)
         }
 
-        def coverage = page.executeJavaScript(coverageScript).javaScriptResult
+        def jsResult = page.executeJavaScript(coverageScript).javaScriptResult
 
         webClient.closeAllWindows()
 
-        generateReports(coverage)
+        generateReports(new Coverage(jsResult))
     }
 
     private void generateReports(coverage) {
@@ -92,74 +94,19 @@ class GenerateCoverageMojo extends GroovyMojo {
         }
     }
 
-    private void generateCsvReport(coverage) {
+    private void generateCsvReport(Coverage coverage) {
         log.info "Generating CSV report"
-        new File("coverage/coverage.csv").withPrintWriter { out ->
-            out.println "Filename;Statements;Executed;Coverage"
-            coverage.files.values().each {
-                out.print "$it.name;"
-                out.print "${it.statements as int};"
-                out.print "${it.executed as int};"
-                out.println "${(it.executed == 0 ?: it.executed / it.statements * 100) as int}%"
-            }
-
-            def t = coverage.totals
-
-            out.print "Total;"
-            out.print "${t.statements as int};"
-            out.print "${t.executed as int};"
-            out.println "${(t.executed == 0 ?: t.executed / t.statements * 100) as int}%"
-        }
+        new CsvReporter("coverage/coverage.csv", coverage).generate()
     }
 
     private void generateXmlReport(coverage) {
         log.info "Generating XML report"
-
-        new File("coverage/coverage.xml").withPrintWriter { writer ->
-            def xml = new MarkupBuilder(writer)
-
-            xml.coverage {
-                files {
-                    coverage.files.values().each {
-                        file(
-                            name: it.name,
-                            statements: it.statements as int,
-                            executed: it.executed as int,
-                            coverage: (it.executed == 0 ?: it.executed / it.statements * 100) as int
-                        )
-                    }
-                }
-
-                def t = coverage.totals
-
-                total(
-                    statements: t.statements as int,
-                    executed: t.executed as int,
-                    coverage: (t.executed == 0 ?: t.executed / t.statements * 100) as int
-                )
-            }
-        }
+        new XmlReporter("coverage/coverage.xml", coverage).generate()
     }
 
-    private void generateConsoleReport(coverage) {
+    private void generateConsoleReport(Coverage coverage) {
         log.info "Generating console report"
-        def buf = ["COVERAGE REPORT"]
-
-        coverage.files.values().each {
-            buf << it.name
-            buf << "  Statements: ${it.statements as int}"
-            buf << "  Executed: ${it.executed as int}"
-            buf << "  Coverage: ${(it.executed == 0 ?: it.executed / it.statements * 100) as int}%"
-        }
-
-        def t = coverage.totals
-
-        buf << "Total"
-        buf << "  Statements: ${t.statements as int}"
-        buf << "  Executed: ${t.executed as int}"
-        buf << "  Coverage: ${(t.executed == 0 ?: t.executed / t.statements * 100) as int}%"
-
-        log.info buf.join("\n  ")
+        new ConsoleReporter(coverage).generate()
     }
 
 }
