@@ -81,8 +81,10 @@ class InstrumentClassesMojo extends GroovyMojo {
         command << srcDir
         command << destDir
 
-        log.info "Running jscoverage with:"
-        log.info command.join("\n\t")
+        if (verbose) {
+            log.info "Running jscoverage with:"
+            log.info command.join("\n\t")
+        }
 
         return command.join(" ")
     }
