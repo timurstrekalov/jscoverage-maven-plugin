@@ -19,7 +19,7 @@ class CoverageData {
     }
 
     private Integer calculateCoverage() {
-        return (executed == 0 ?: executed / statements * 100) as int
+        return (executed == 0 ? 0 : executed / statements * 100) as int
     }
 
 }
