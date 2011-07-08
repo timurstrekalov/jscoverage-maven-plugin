@@ -42,7 +42,7 @@ class InstrumentClassesMojo extends GroovyMojo {
     void execute() {
         log.info "Cleaning destination directory"
 
-        new AntBuilder().delete dir: destDir
+        ant.delete dir: destDir
 
         log.info "Preparing to instrument classes..."
 

@@ -48,6 +48,11 @@ class GenerateCoverageMojo extends GroovyMojo {
     List<String> formats
 
     /**
+     * @parameter default-value="${project.build.directory}"
+     */
+    String testBaseDir
+
+    /**
      * Directory where the coverage files will be written
      *
      * @parameter default-value="${project.build.directory}${file.separator}coverage"
@@ -67,10 +72,18 @@ class GenerateCoverageMojo extends GroovyMojo {
 
         HtmlPage page
 
-        tests.each {
+        def scanner = ant.fileScanner {
+            fileset(dir: testBaseDir, defaultexcludes: false) {
+                tests.each {
+                    include name: it
+                }
+            }
+        }
+
+        scanner.each {
             log.info "Running $it"
 
-            page = webClient.getPage(new File(it).toURI() as String)
+            page = webClient.getPage(it.toURI() as String)
 
             webClient.waitForBackgroundJavaScript 30000
 
