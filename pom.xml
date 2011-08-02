@@ -48,4 +48,15 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>jasmine-maven-plugin-snapshots</id>
+            <url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>jasmine-maven-plugin-releases</id>
+            <url>http://nexus.ovimaps.devbln.europe.nokia.com:8081/nexus/content/repositories/jasmine-maven-plugin-releases</url>
+        </repository>
+    </distributionManagement>
+
 </project>

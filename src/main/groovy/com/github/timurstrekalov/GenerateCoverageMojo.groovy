@@ -48,6 +48,14 @@ class GenerateCoverageMojo extends GroovyMojo {
     List<String> formats
 
     /**
+     * CSV report delimiter. Will be ignored if CSV is not selected as one of
+     * the report formats.
+     *
+     * @parameter default-value=";"
+     */
+    String csvDelimiter
+
+    /**
      * @parameter default-value="${project.build.directory}"
      */
     String testBaseDir
@@ -70,8 +78,6 @@ class GenerateCoverageMojo extends GroovyMojo {
 
         webClient.scriptPreProcessor = preProcessor
 
-        HtmlPage page
-
         def scanner = ant.fileScanner {
             fileset(dir: testBaseDir, defaultexcludes: false) {
                 tests.each {
@@ -79,6 +85,15 @@ class GenerateCoverageMojo extends GroovyMojo {
                 }
             }
         }
+
+        if (!scanner.iterator().hasNext()) {
+            log.warn "No tests found"
+            return
+        }
+
+        HtmlPage page
+
+        log.info "Running tests"
 
         scanner.each {
             log.info "Running $it"
@@ -119,7 +134,8 @@ class GenerateCoverageMojo extends GroovyMojo {
 
     private void generateCsvReport(Coverage coverage) {
         log.info "Generating CSV report"
-        new CsvReporter("${coverageOutputDir}/coverage.csv", coverage).generate()
+        new CsvReporter("${coverageOutputDir}/coverage.csv", coverage,
+            csvDelimiter).generate()
     }
 
     private void generateXmlReport(coverage) {

@@ -34,5 +34,5 @@ Example config:
 
 Instrumentation:
     mvn jscoverage:instrument
-Coverage report;
+Coverage report:
     mvn jscoverage:coverage

@@ -5,13 +5,19 @@ import com.github.timurstrekalov.coverage.CoverageData
 
 class CsvReporter extends AbstractReporter {
 
-    CsvReporter(String path, Coverage coverage) {
+    private String delimiter
+
+    CsvReporter(String path, Coverage coverage, String delimiter) {
         super(new File(path).newPrintWriter(), coverage)
+
+        this.delimiter = delimiter
     }
 
     @Override
     public void generate() {
-        writer.println "Filename;Statements;Executed;Coverage"
+        def header = ["Filename", "Statements", "Executed", "Coverage"]
+
+        writer.println header.join(delimiter)
 
         forEachFile { CoverageData c ->
             outputCoverage(c)
@@ -23,10 +29,9 @@ class CsvReporter extends AbstractReporter {
     }
 
     private void outputCoverage(CoverageData c) {
-        writer.print "$c.title;"
-        writer.print "$c.statements;"
-        writer.print "$c.executed;"
-        writer.println "$c.coverageString"
+        def line = [c.title, c.statements, c.executed, c.coverageString]
+
+        writer.println line.join(delimiter)
     }
 
 }
