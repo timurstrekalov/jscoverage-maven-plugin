@@ -154,10 +154,10 @@ class PreProcessor implements ScriptPreProcessor {
 
     def result = "{}"
     Boolean injected = false
-    File instrumentedSrcDir
+    String instrumentedSrcDir
 
-    PreProcessor(instrumentedSrcDir) {
-        this.instrumentedSrcDir = instrumentedSrcDir
+    PreProcessor(File instrumentedSrcDir) {
+        this.instrumentedSrcDir = instrumentedSrcDir.toURI() as String
     }
 
     String preProcess(HtmlPage htmlPage, String sourceCode, String sourceName,
@@ -168,8 +168,10 @@ class PreProcessor implements ScriptPreProcessor {
             return "window._\$jscoverage = $result;\n$sourceCode"
         }
 
-        if (sourceCode.indexOf("loadScript(jasmine.plugin.jsSrcDir + fileName);") != -1) {
-            return sourceCode.replaceAll(/jasmine\.plugin\.jsSrcDir/, "'${instrumentedSrcDir.toURI() as String}'")
+        if (sourceCode.indexOf("jasmine.plugin.jsSrcDir = ") != -1) {
+            return sourceCode.replaceAll(
+				/jasmine\.plugin\.jsSrcDir = '(.*)';/,
+				"jasmine.plugin.jsSrcDir = '$instrumentedSrcDir';")
         }
 
         return sourceCode
