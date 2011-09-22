@@ -2,6 +2,7 @@ package com.github.timurstrekalov;
 
 import java.util.List
 
+import org.apache.maven.plugin.MojoExecutionException
 import org.codehaus.groovy.maven.mojo.GroovyMojo
 
 /**
@@ -35,6 +36,11 @@ class InstrumentClassesMojo extends GroovyMojo {
     List<String> excludes
 
     /**
+     * @parameter
+     */
+    List<String> noInstrument
+
+    /**
      * @parameter default-value=false
      */
     Boolean verbose
@@ -52,7 +58,13 @@ class InstrumentClassesMojo extends GroovyMojo {
 
         def jscoverage = createCommand().execute()
         jscoverage.consumeProcessOutput System.out, System.err
-        jscoverage.waitFor()
+
+        Integer exitCode = jscoverage.waitFor()
+
+		if (exitCode != 0) {
+			throw new MojoExecutionException(
+				"JSCoverage exited with code $exitCode, aborting");
+		}
     }
 
     private String createCommand() {
@@ -64,18 +76,16 @@ class InstrumentClassesMojo extends GroovyMojo {
             command << "--verbose"
         }
 
-        def scanner = ant.fileScanner {
-            fileset(dir: srcDir, defaultexcludes: false) {
-                excludes.each {
-                    include name: it
-                }
-            }
-        }
-
         def root = new File(srcDir).toURI()
-        def excludedBuf = scanner.collect { root.relativize(it.toURI()) }
 
-        command << excludedBuf.collect { "--exclude=$it" }.join(" ")
+		appendCommand(command, noInstrument) { File file ->
+			return "--no-instrument=${root.relativize(file.toURI())}"
+		}
+
+		appendCommand(command, excludes) { File file ->
+			return "--exclude=${root.relativize(file.toURI())}"
+		}
+
         command << srcDir
         command << destDir
 
@@ -86,5 +96,31 @@ class InstrumentClassesMojo extends GroovyMojo {
 
         return command.join(" ")
     }
+
+	private void appendCommand(List<String> command, List<String> patterns,
+		Closure collector) {
+
+		if (!patterns || patterns.size() == 0) {
+			return
+		}
+
+		def antPatterns = patterns.findAll { it.contains('*') }
+
+		patterns.findAll { !it.contains('*') }.each { String path ->
+			command << collector(new File(srcDir, path))
+		}
+
+		if (antPatterns.size() > 0) {
+			def scanner = ant.fileScanner {
+				fileset(dir: srcDir, defaultexcludes: false) {
+					patterns.each {
+						include name: it
+					}
+				}
+			}
+
+			command.addAll(scanner.collect(collector))
+		}
+	}
 
 }

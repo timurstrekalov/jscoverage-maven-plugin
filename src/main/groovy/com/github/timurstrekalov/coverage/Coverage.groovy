@@ -8,7 +8,7 @@ class Coverage {
     CoverageData total
 
     Coverage(ScriptableObject obj) {
-        obj.files.values().each {
+        obj.files.values().sort({ it.name }).each {
             files << new CoverageData(it.name, it.statements, it.executed)
         }
 
