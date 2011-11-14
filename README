@@ -9,7 +9,7 @@ Example config:
 <plugin>
     <groupId>com.github.timurstrekalov</groupId>
     <artifactId>jscoverage-maven-plugin</artifactId>
-    <version>0.4</version>
+    <version>0.4.2</version>
     <configuration>
         <jsCoveragePath>jscoverage</jsCoveragePath>
         <srcDir>src/main/javascript</srcDir>
