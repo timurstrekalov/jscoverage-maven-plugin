@@ -7,6 +7,10 @@ abstract class AbstractReporter {
     protected PrintWriter writer
     protected Coverage coverage
 
+    AbstractReporter() {
+        
+    }
+
     AbstractReporter(PrintWriter writer, Coverage coverage) {
         this.writer = writer
         this.coverage = coverage
