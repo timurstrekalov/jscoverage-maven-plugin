@@ -47,5 +47,15 @@
             </plugin>
         </plugins>
     </build>
+	
+	<pluginRepositories>
+		<pluginRepository>
+				<id>codehaus.plugin</id>
+				<url>http://repository.codehaus.org</url>
+				<snapshots>
+					 <enabled>true</enabled>
+				</snapshots>
+			</pluginRepository>
+	</pluginRepositories>
 
 </project>
