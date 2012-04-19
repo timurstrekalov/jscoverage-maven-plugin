@@ -1,3 +1,5 @@
+*This project is no longer supported*. Use [Saga](https://github.com/timurstrekalov/saga) instead.
+
 Generates coverage information about JavaScript files using JSCoverage.
 
 As of this moment, you have to provide the path to jscoverage.
