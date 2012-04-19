@@ -35,6 +35,9 @@ Example config:
     </plugin>
 
 Instrumentation:
-+ mvn jscoverage:instrument
+    
+    mvn jscoverage:instrument
+
 Coverage report:
-+ mvn jscoverage:coverage
+
+    mvn jscoverage:coverage
